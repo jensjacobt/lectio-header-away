@@ -1,15 +1,30 @@
-function headerBack() {
-  var infoHeaders = document.getElementsByClassName('s2infoHeader');
-  for (var i = 0; i < infoHeaders.length; i++) {
-    infoHeaders[i].style.display = 'table-cell';
+'use strict';
+
+function setHeaderVisible(isVisible) {
+  let display = isVisible ? 'table-cell' : 'none';
+  let infoHeaders = document.getElementsByClassName('s2infoHeader');
+  for (let i = 0; i < infoHeaders.length; i++) {
+    infoHeaders[i].style.display = display;
   }
 }
 
-chrome.runtime.sendMessage({name: "showHeader?"}, function (response) {
-  if (response.value === 'true') {
-  	headerBack();
-  	document.body.addEventListener('DOMContentLoaded', function (event) {
-        headerBack();
-  	});
+function showHeaderBasedOnSetting() {
+  chrome.runtime.sendMessage({name: "shouldShowHeader"}, function (response) {
+      setHeaderVisible(response.showHeader);
+  });
+}
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.action === "badge_clicked") {
+    showHeaderBasedOnSetting();
+  }
+  sendResponse({log: 'Badge clicked'});
+});
+
+chrome.runtime.sendMessage({name: "shouldShowHeader"}, function (response) {
+  if (response.showHeader) {
+    document.addEventListener('DOMContentLoaded', function (event) {
+      setHeaderVisible(true);
+    });
   }
 });

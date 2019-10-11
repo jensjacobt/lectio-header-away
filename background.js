@@ -1,5 +1,7 @@
+'use strict';
+
 function updateBadge(showHeader) {
-  badge_text = showHeader ? "FRA" : "";
+  let badge_text = showHeader ? "FRA" : "";
   chrome.browserAction.setBadgeText({text: badge_text});
 }
 
@@ -8,16 +10,25 @@ function setShowHeader(showHeader) {
   updateBadge(showHeader);
 }
 
-chrome.browserAction.onClicked.addListener(function (tab){
-  state = localStorage.getItem('showHeader') === 'true';
-  setShowHeader(!state);
-  chrome.tabs.update(tab.id, {url: tab.url});
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.name === "shouldShowHeader") {
+    sendResponse({showHeader: localStorage.getItem('showHeader') === 'true'});
+  }
 });
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.name == "showHeader?") {
-    sendResponse({value: localStorage.getItem('showHeader')});
-  }
+chrome.browserAction.onClicked.addListener(function (tab) {
+  let currentShowHeader = localStorage.getItem('showHeader') === 'true';
+  setShowHeader(!currentShowHeader);
+  chrome.tabs.query({}, function(tabs) {
+    let regex = RegExp('https?://www.lectio.dk/lectio/[0-9]*/SkemaNy.aspx.*');
+    for (let i = 0; i < tabs.length; i++) {
+      if(regex.test(tabs[i].url)) {
+        chrome.tabs.sendMessage(tabs[i].id, {action: "badge_clicked"}, function(response) {
+          console.log(response.log);
+        });
+      }
+    }
+  });
 });
 
 chrome.runtime.onInstalled.addListener(function () {

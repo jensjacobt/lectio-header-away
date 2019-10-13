@@ -1,38 +1,50 @@
 'use strict';
 
-function updateBadge(showHeader) {
-  let badge_text = showHeader ? "FRA" : "";
-  chrome.browserAction.setBadgeText({text: badge_text});
-}
+let ports = [];
 
-function setShowHeader(showHeader) {
-  localStorage.setItem('showHeader', showHeader);
-  updateBadge(showHeader);
-}
-
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.name === "shouldShowHeader") {
-    sendResponse({showHeader: localStorage.getItem('showHeader') === 'true'});
-  }
+chrome.runtime.onConnect.addListener(function(port) {
+  // console.log('Port connected:', port.name);
+  ports.push(port);
+  port.onDisconnect.addListener(function() {
+    // console.log('Port disconnected:', port.name);
+    ports.pop(port);
+  });
+  port.onMessage.addListener(function(message) {
+    if(message.action == 'firstUpdate') {
+      updateHeader([port]);
+    }
+  });
 });
 
 chrome.browserAction.onClicked.addListener(function (tab) {
-  let currentShowHeader = localStorage.getItem('showHeader') === 'true';
+  let currentShowHeader = getShowHeader();
   setShowHeader(!currentShowHeader);
-  chrome.tabs.query({}, function(tabs) {
-    let regex = RegExp('https?://www.lectio.dk/lectio/[0-9]*/SkemaNy.aspx.*');
-    for (let i = 0; i < tabs.length; i++) {
-      if(regex.test(tabs[i].url)) {
-        chrome.tabs.sendMessage(tabs[i].id, {action: "badge_clicked"}, function(response) {
-          console.log(response.log);
-        });
-      }
-    }
-  });
+  updateHeader(ports);
 });
 
 chrome.runtime.onInstalled.addListener(function () {
   setShowHeader(false);
 });
 
-updateBadge(localStorage.getItem('showHeader') === 'true');
+updateBadge(getShowHeader());
+
+function updateHeader(ports) {
+  let showHeader = getShowHeader();
+  ports.forEach(port => {
+    port.postMessage({action: 'updateHeader', showHeader: showHeader});
+  });
+}
+
+function updateBadge(showHeader) {
+  let badge_text = showHeader ? 'FRA' : '';
+  chrome.browserAction.setBadgeText({text: badge_text});
+}
+
+function getShowHeader() {
+  return localStorage.getItem('showHeader') === 'true';
+}
+
+function setShowHeader(showHeader) {
+  localStorage.setItem('showHeader', showHeader);
+  updateBadge(showHeader);
+}

@@ -10,4 +10,3 @@ når du vil, men undgår at blive generet af dem, når du bare skal se dine modu
 
 Dette bruges rettighederne til:
 - "Tilgå dine data for www.lectio.dk": Skjule headeren.
-- "Tilgå faneblade": Genopfriske fanen, når der klikkes på knappen.

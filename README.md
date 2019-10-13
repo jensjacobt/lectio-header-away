@@ -10,3 +10,7 @@ når du vil, men undgår at blive generet af dem, når du bare skal se dine modu
 
 Dette bruges rettighederne til:
 - "Tilgå dine data for www.lectio.dk": Skjule headeren.
+
+Installeres fra en af de nedenstående:
+- [Chrome Webshop](https://chrome.google.com/webstore/detail/lectio-header-away/ppcnpfbnhkemjjjdidkedjdmleggeikd)
+- [Firefox Addons](https://addons.mozilla.org/firefox/addon/lectio-header-away/)

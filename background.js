@@ -7,7 +7,7 @@ chrome.runtime.onConnect.addListener(function(port) {
   ports.push(port);
   port.onDisconnect.addListener(function() {
     // console.log('Port disconnected:', port.name);
-    ports.pop(port);
+    ports.splice(ports.indexOf(port), 1);
   });
   port.onMessage.addListener(function(message) {
     if(message.action == 'firstUpdate') {

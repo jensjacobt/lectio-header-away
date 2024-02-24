@@ -14,3 +14,6 @@ Dette bruges rettighederne til:
 Installeres fra en af de nedenstående:
 - [Chrome Webshop](https://chrome.google.com/webstore/detail/lectio-header-away/ppcnpfbnhkemjjjdidkedjdmleggeikd)
 - [Firefox Addons](https://addons.mozilla.org/firefox/addon/lectio-header-away/)
+
+## Privatlivspolitik
+Udvidelsen sender ingen data over internettet og indsamler således ingen oplysninger fra brugerne.

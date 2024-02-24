@@ -3,33 +3,33 @@
 let ports = [];
 
 chrome.runtime.onConnect.addListener(function(port) {
-  // console.log('Port connected:', port.name);
   ports.push(port);
   port.onDisconnect.addListener(function() {
-    // console.log('Port disconnected:', port.name);
     ports.splice(ports.indexOf(port), 1);
   });
-  port.onMessage.addListener(function(message) {
+  port.onMessage.addListener(async function(message) {
     if(message.action == 'firstUpdate') {
-      updateHeader([port]);
+      updateHeader([port], await getShowHeader());
     }
   });
 });
 
-chrome.browserAction.onClicked.addListener(function (tab) {
-  let currentShowHeader = getShowHeader();
-  setShowHeader(!currentShowHeader);
-  updateHeader(ports);
+chrome.storage.local.get(['showHeader'], ({ showHeader }) => {
+  updateBadge(showHeader);
+});
+
+chrome.action.onClicked.addListener(async function () {
+  const showHeader = await getShowHeader();
+  const newShowHeader = !showHeader;
+  setShowHeader(newShowHeader);
+  updateHeader(ports, newShowHeader);
 });
 
 chrome.runtime.onInstalled.addListener(function () {
   setShowHeader(false);
 });
 
-updateBadge(getShowHeader());
-
-function updateHeader(ports) {
-  let showHeader = getShowHeader();
+function updateHeader(ports, showHeader) {
   ports.forEach(port => {
     port.postMessage({action: 'updateHeader', showHeader: showHeader});
   });
@@ -37,14 +37,15 @@ function updateHeader(ports) {
 
 function updateBadge(showHeader) {
   let badge_text = showHeader ? 'FRA' : '';
-  chrome.browserAction.setBadgeText({text: badge_text});
+  chrome.action.setBadgeText({text: badge_text});
 }
 
-function getShowHeader() {
-  return localStorage.getItem('showHeader') === 'true';
+async function getShowHeader() {
+  const { showHeader } = await chrome.storage.local.get(['showHeader']);
+  return showHeader;
 }
 
-function setShowHeader(showHeader) {
-  localStorage.setItem('showHeader', showHeader);
+async function setShowHeader(showHeader) {
+  chrome.storage.local.set({ 'showHeader': showHeader });
   updateBadge(showHeader);
 }

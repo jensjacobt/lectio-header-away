@@ -1,6 +1,6 @@
 'use strict';
 
-let port = chrome.runtime.connect({name: 'LectioHeaderAway'}); //  + '-' + Math.random()
+let port = chrome.runtime.connect({name: 'LectioHeaderAway'});
 
 port.onMessage.addListener(function(message) {
   if (message.action == 'updateHeader') {
@@ -8,7 +8,7 @@ port.onMessage.addListener(function(message) {
   }
 });
 
-document.addEventListener('DOMContentLoaded', function(event) {
+document.addEventListener('DOMContentLoaded', function() {
   port.postMessage({action: 'firstUpdate'});
 });
 

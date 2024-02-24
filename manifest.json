@@ -1,10 +1,10 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name":         "Lectio Header Away",
   "description":  "Fjerner headerne for dagene fra Lectio",
-  "version":      "1.4",
+  "version":      "1.5",
   "background": {
-    "page": "background.html"
+    "service_worker": "background.js"
   },
   "content_scripts": [ {
     "matches": [
@@ -17,7 +17,7 @@
     "css": [ "LectioHeaderAway.css" ],
     "run_at": "document_start"
   } ],
-  "browser_action": {
+  "action": {
     "default_icon": "icon19.png",
     "default_title": "Lectio Header Away"
   },
@@ -28,11 +28,16 @@
     "128": "icon128.png"
   },
   "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
     "http://www.lectio.dk/*/SkemaNy.aspx*",
     "https://www.lectio.dk/*/SkemaNy.aspx*",
     "http://www.lectio.dk/lectio/*/SkemaAvanceret.aspx*",
     "https://www.lectio.dk/lectio/*/SkemaAvanceret.aspx*"
   ],
-  "content_security_policy": "default-src 'none'; script-src 'self'"
+  "content_security_policy":{ 
+    "extension_pages": "default-src 'none'; script-src 'self'"
+  }
 }
   
